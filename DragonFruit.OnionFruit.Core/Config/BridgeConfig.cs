@@ -92,6 +92,8 @@ namespace DragonFruit.OnionFruit.Core.Config
     /// </summary>
     public class BridgeConfig : TorrcConfigEntry
     {
+        public string PlainBridgeUrl { get; set; }
+
         /// <summary>
         /// <see cref="BridgeEntry"/> instances to use when connecting to the Tor network
         /// </summary>
@@ -105,6 +107,11 @@ namespace DragonFruit.OnionFruit.Core.Config
 
         public override async Task WriteAsync(StreamWriter writer)
         {
+            if (!string.isNullOrEmpty(PlainBridgeUrl)) {
+                await UpdatePlainBridgesFromUrlAsync();
+            }
+
+
             foreach (var transport in Transports ?? Enumerable.Empty<PluggableTransport>())
             {
                 await writer.WriteLineAsync($"ClientTransportPlugin {transport.Type} exec {transport.ExecutablePathAndArgs}").ConfigureAwait(false);
@@ -119,6 +126,30 @@ namespace DragonFruit.OnionFruit.Core.Config
                     await writer.WriteAsync("Bridge ").ConfigureAwait(false);
                     await writer.WriteLineAsync(bridge.ToString()).ConfigureAwait(false);
                 }
+            }
+        }
+
+        private async Task UpdatePlainBridgesFromUrlAsync() {
+            try {
+                using var client = new HttpClient();
+                var response = await client.GetAsync(PlainBridgeUrl);
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+
+                var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var newBridges = new List<BridgeEntry>();
+
+                foreach (var line in lines)
+                {
+                    if (BridgeEntry.TryParse(line, out var bridge))
+                    {
+                        newBridges.Add(bridge);
+                    }
+                }
+
+                Bridges = newBridges;
+            } catch (Exception e) {
+                Console.WriteLine($"Failed to update plain bridges from URL: {e.Message}");
             }
         }
     }

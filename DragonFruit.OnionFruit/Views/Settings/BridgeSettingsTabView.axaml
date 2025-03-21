@@ -30,6 +30,14 @@
                 </controls:SettingsExpander.Footer>
             </controls:SettingsExpander>
 
+            <!-- Start of plain bridge url -->
+            <controls:SettingsExpander Description="Plain Bridge URL" IconSource="{Binding BridgeTypeIcon}">
+                <controls:SettingsExpander.Footer>
+                    <TextBox Text="{Binding PlainBridgeUrl}" Watermark="Enter URL for plain bridges"/>
+                </controls:SettingsExpander.Footer>
+            </controls:SettingsExpander>
+            <!-- End of plain bridge url -->
+
             <controls:SettingsExpander Description="Bridge Lines" IconSource="{Binding BridgeLinesIcon}" IsVisible="{Binding CanAddBridgeLines, Mode=OneWay}" IsExpanded="True" IsClickEnabled="False">
                 <controls:SettingsExpander.Footer>
                     <Label Content="{Binding CurrentBridgeLineCount, StringFormat='{}{0} Entries'}"/>

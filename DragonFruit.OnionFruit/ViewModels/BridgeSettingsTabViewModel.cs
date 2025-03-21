@@ -25,6 +25,7 @@ namespace DragonFruit.OnionFruit.ViewModels
     {
         private readonly OnionFruitSettingsStore _settings;
         private readonly TransportManager _transports;
+        private string _plainBridgeUrl;
 
         private readonly IDictionary<string, Match> _matchCache = new Dictionary<string, Match>();
 
@@ -43,6 +44,7 @@ namespace DragonFruit.OnionFruit.ViewModels
         {
             _settings = settings;
             _transports = transports;
+            _plainBridgeUrl = settings.GetValue<string>(OnionFruitSetting.PlainBridgeUrl);
 
             var transportOptions = new Dictionary<TransportType, string>
             {
@@ -122,6 +124,14 @@ namespace DragonFruit.OnionFruit.ViewModels
         {
             get => _newBridgeLines;
             set => this.RaiseAndSetIfChanged(ref _newBridgeLines, value);
+        }
+
+        public string PlainBridgeUrl {
+            get => _plainBridgeUrl;
+            set {
+                this.RaiseAndSetIfChanged(ref _plainBridgeUrl, value);
+                _settings.SetValue(OnionFruitSetting.PlainBridgeUrl, value);
+            }
         }
 
         /// <summary>
